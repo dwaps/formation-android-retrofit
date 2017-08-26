@@ -1,7 +1,10 @@
 package fr.dwaps.testretrofit;
 
+import java.util.List;
+
 import retrofit2.Call;
-import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
@@ -10,11 +13,17 @@ import retrofit2.http.POST;
  */
 
 public interface PersonAPI {
+    public static final String ENDPOINT = "https://www.dwaps.fr/";
 
-    @GET("/")
-    Call<Person> getPersons();
+    @GET("/tests/bdd-to-json")
+    Call<List<Person>> getPersons();
 
-    @POST("/")
-    Call<Person> postPerson(@Body Person person);
+    @FormUrlEncoded
+    @POST("/tests/bdd-to-json/user-new")
+    Call<List<Person>> postPerson(
+        @Field("nom") String nom,
+        @Field("email") String email,
+        @Field("age") int age
+    );
 
 }

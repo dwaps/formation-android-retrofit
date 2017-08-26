@@ -1,12 +1,20 @@
 package fr.dwaps.testretrofit;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by Michael on 25/08/2017.
  */
 
 public class Person {
+
+    @SerializedName("nom")
     private String nom;
+
+    @SerializedName("email")
     private String email;
+
+    @SerializedName("age")
     private int age;
 
     public Person(String nom, String email, int age) {

@@ -1,23 +1,56 @@
 package fr.dwaps.testretrofit;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
+import java.io.IOException;
+import java.util.List;
+
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
+    private Call<List<Person>> call;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://dwaps.fr/tests/bdd-to-json/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+        PersonAPI personAPI = new Retrofit.Builder()
+                .baseUrl(PersonAPI.ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(PersonAPI.class);
 
-        retrofit.create(PersonAPI.class);
+        Person person = new Person("TEST", "TEST@TEST.COM", 987);
+        call = personAPI.postPerson(
+                person.getNom(),
+                person.getEmail(),
+                person.getAge()
+        );
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    call.execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        call = null;
     }
 }
