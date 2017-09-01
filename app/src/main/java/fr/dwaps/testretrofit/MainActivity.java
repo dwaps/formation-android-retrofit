@@ -19,6 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private PersonAPI personAPI;
+    private Person person;
 
     private EditText et_nom;
     private EditText et_email;
@@ -46,17 +47,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendData(View v) {
-        String nom = et_nom.getText().toString();
-        String email = et_email.getText().toString();
-        String age = et_age.getText().toString();
-
-        if (!nom.equals("") && !email.equals("") && !age.equals("")) {
-            Person person = new Person(nom, email, Integer.parseInt(age));
-
+        if (hydratePerson()) {
             Call<List<Person>> call = personAPI.postPerson(
-                    person.getNom(),
-                    person.getEmail(),
-                    person.getAge()
+                person.getNom(),
+                person.getEmail(),
+                person.getAge()
             );
 
             call.enqueue(new Callback<List<Person>>() {
@@ -67,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<List<Person>> call, Throwable t) {
-
+                    Toast.makeText(MainActivity.this, "Les données n'ont pas été envoyées.\nContactez le développeur.", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -77,10 +72,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void deleteData(View v) {
+        if (hydratePerson()) {
+            Call<List<Person>> call = personAPI.deletePerson(
+                person.getNom(),
+                person.getEmail(),
+                person.getAge()
+            );
+
+            call.enqueue(new Callback<List<Person>>() {
+                @Override
+                public void onResponse(Call<List<Person>> call, Response<List<Person>> response) {
+                    Toast.makeText(MainActivity.this, response.body().toString(), Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(Call<List<Person>> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "La suppression n'a pas été faite.\nContactez le développeur.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+            et_nom.setText("");
+            et_email.setText("");
+            et_age.setText("");
+        }
+    }
+
+    private boolean hydratePerson() {
+        String nom = et_nom.getText().toString();
+        String email = et_email.getText().toString();
+        String age = et_age.getText().toString();
+
+        if (
+                (null != nom && !nom.equals(""))
+                &&
+                (null != email && !email.equals(""))
+                &&
+                (null != age && !age.equals(""))
+            ) {
+            try {
+                person = new Person(nom, email, Integer.parseInt(age));
+                return true;
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Veuillez renseigner un age correct !", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        return false;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         personAPI = null;
+        person = null;
 
         et_nom = null;
         et_email = null;
