@@ -49,13 +49,13 @@
             android:id="@+id/submit"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:onClick="sendData"
+            android:onClick="sendPerson"
             android:text="@string/submit" />
         <Button
             android:id="@+id/delete"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:onClick="deleteData"
+            android:onClick="deletePerson"
             android:text="@string/delete" />
     </android.support.v7.widget.ButtonBarLayout>
 
